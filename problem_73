@@ -1,0 +1,173 @@
+from counting_fractions import factors
+from math import sqrt
+def count_fracts(max_d):
+    d = 2
+    count = 0
+    while d <= max_d:
+        facts = factors(d)
+        #all are valid bar multiples of the factors
+        subtractions = 0
+        for f in facts:
+            subtractions += int(d/f) - 1
+        count += (d - subtractions) - 1
+        d +=1
+    return count
+
+
+def advanced_count(max_d):
+    #I think there is a pattern here
+    #for primes the number is d - 1
+    #for non-primes
+    #1: get list of primes up to max d
+    #2: for each prime that is a factor, there will be d/prime - 1 fractions
+    primes = get_primes(max_d)
+    subtractions = 0
+    count = 0
+
+
+    for i,p in enumerate(primes):
+        numerator_sub = int((max_d - p)/p) #this will always be correct for the primes
+        #3/6,3/9,3/12,3/15,3/18,3/21,3/24,3/27,3/30,3/33,3/36,3/39,3/42,3/35,3/48,3/51,3/54,3/57,3/60
+        #let'se use n = 30 as an example, dmax = 100
+        #n = 2 will skip every 2nd denominator
+        #n = 3 will skip every 3rd, n = 5 will skip every 5th.
+        #now on 30/60 this will be skipped 3 times so we need to figure out a way to skip the skip for 3 and 5, we can only really do that by knowing that 30 has those factors
+        # the 2 loop could- add in an extra count every 6 and 10 and 14 to compensate. will add in extra for 30 too. this will be removed by 3, then compensated for again
+        #this will work.
+        #so for every (max_dp / prime numerator), we remove max_dp - prime /prime of the options, then for every subsequent prime in the list, for numerators max_dp/(prime*sub_prime) 
+        #we add max_dp/(prime*sub_prime) values back in
+
+        terms = numerator_sub - 1
+        additions = 0
+        #2/4, 2/6, 2/8, 2/10, 2/12, 2/14 (numerater sub = 5)
+        #4/6, 4/8, 4/10, 4/12, 4/14 --- 4
+        #6/8, 6/10, 6/12, 6/14 ---3 (+1)
+        #8/10, 8/12, 8/14
+        #10/12, 10/14
+        #12/14
+        #6/9, 6/12,
+        #9/12
+        for p2 in primes[i+1:]:
+            occasions = int(max_d/(p*p2)) - 1    #we need the numerator to also be p*p2
+            if occasions == 0:
+                break
+            #actually also an arithmetic series depending on the denominator
+            additions += occasions/2*(occasions + 1 )
+
+        denominator_sub = terms/2*(terms + 1)   #arithmetic sequence (invalid fractions decreases by one for each successive multiple of the prime)
+        subtractions += numerator_sub + denominator_sub - additions
+
+    for n in range(1,max_d+1):
+        count += (max_d - n)
+    #     if n in primes:
+    #         count -= int((max_d - p)/p)
+    #     else:
+    #         facts = factors(n)
+    #         count -=
+
+
+
+    #for each numerator, 
+    count -= subtractions
+    return count
+
+
+    def find_multi_combos(p, other_primes,max_d):
+        #extra counts due to a number being counted multiple times is an issue
+        #for p, we go through the other primes and do:
+        #p0*pi*pj*... until we go past max_d
+        counts += find_multi_combos(other_primes(i,other_primes[i:]))
+        for i in range(len(other_primes)):
+            
+        
+    #algorithm:
+        # do a sieve with primes where:
+        # for each prime we find all the invalid fracitons
+        #e.g. for 2: we start with n = 2, so therefore any value n = 2*i is invalid, we add these to the subtractions
+        # then we repeat for any n = j*2, so for d = 8
+        # 2/4 is invalid, 2/6 invalid, 2/8 invalid. then 4/6, 4/8 invalid, 6/8, 6/10, 6/12 invalid.
+        # for 3: 3/6 invalid 3/9 invalid 3/12 invalid. then 6/9, 6/12 is invalid but is covered by 2. so for 6 we skip every 2nd fraction
+        #say for 5: 10 - skip every 2nd fracion. 15/45 - skip because of 3. so skip every 3rd. perhaps it is easier to skip from the first prime so we don't have
+        #to cycle through after the fact so for 2:
+        # say we are counting for 5- every 2nd n we subtract half, every 3rd n we subtract a third. however what happens every 6th? perhaps we can somewhat brute force now we have less primes
+
+        # n= 2 is fine.
+        # n= 4 is fine.
+        # n =6 we skip every
+        # 
+        # now for 4 we literally ignore it as it is not a prime
+        # for 5 all is valid (up to 8 etc.)
+        # 6 is not a prime
+
+
+
+    # subtractions = 0
+    # count = 0
+    # for j,p in enumerate(primes):
+    #     #for 2 it is 1 + 2 + 3 + 4 + 5 + 6...
+    #     #for 3 it is 1 + 
+    #     terms = int(max_d/p) 
+    #     subtractions += sum([i for i in range(1,terms)])
+    #     for p2 in primes[:j]:
+    #         terms = int(max_d / (p*p2))
+    #         subtractions -= sum([i for i in range(1,terms)])
+    # count = sum([i for i in range(max_d-1)]) - subtractions
+    # return count
+    #I think we have a subtraction count
+    #for example- 2 will subtract half the fractions from even denominators
+    #3 will subtract 1/3 fractions from 1/3 of the numbers
+    #what to do when they overlap? e.g. 12? the next prime i.e. 3 in this case
+    #every 6 fractions there will be one NOT subtracted
+
+
+#new idea- every fraction is a product of primes as the numerator and a product of primes as the denominator
+#simply cycle through the combinations of primes to find the product
+#in fact, you could use combinations formulas potentially
+#i.e. p1/p2...pn for each n
+#then p1*pi/pj for i,j i!=j
+#e.g. for p1, p1^n < max_d
+    #all combinations of primes not including p1
+#then we look at more combinations, we can probably combine some processing with the combinations formula
+
+def brute_force(max_d):
+    #basic algorithm to brute force fractions so we can test the actual algorithm
+    count =0
+    for n in range(1,max_d+1):
+        n_factors = factors(n)
+        for d in range(n+1,max_d+1):
+            d_factors = factors(d)
+            skip = False
+            for f in d_factors:
+                if f in n_factors:
+                    skip = True
+                    break
+            if not skip:
+                count += 1
+    return count
+
+
+def get_primes(max_d):
+    check_limit = int(max_d/2+1)
+    f_list = [i for i in range(2,check_limit+1)]
+    ticks = [True for i in range(2,check_limit+1)]
+    d = 2
+    primes = []
+    while d <= check_limit:
+        if ticks[d-2]:
+            val = f_list[d-2]
+            primes.append(val)
+            k = val*val - 2
+            while k < check_limit - 1:
+                ticks[k] = False
+                k += val
+        d += 1
+    return primes
+
+if __name__ == "__main__":
+    # print(count_fracts(100000))
+    # for i in range(100000):
+    #     f = factors(i)
+    # get_primes(100000)
+    print(brute_force(150))
+    print(advanced_count(150))
+

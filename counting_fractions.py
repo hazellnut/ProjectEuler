@@ -1,3 +1,5 @@
+from math import sqrt
+
 def count_fractions(dmax,n1,d1,n2,d2):
     #the fractions that count have a numerator and denominator that do not have a common multiple
     #is there an easy to find this?
@@ -38,28 +40,24 @@ def count_fractions(dmax,n1,d1,n2,d2):
     return count
 
 def factors(a):
+    limit = sqrt(a)
     num = 2
     facts = []
-    counters = []
     remainder = a
-    while num <= remainder:
-        skip = False
-        for i in range(len(facts)):
-            counters[i] -=1
-            if counters[i] == 0:
-                skip = True
-                counters[i] = facts[i]
-        if remainder %num == 0 and not skip:
-            remainder = remainder/num
+    while num <= limit:
+        if remainder %num == 0:
+            while (remainder %num) == 0:
+                remainder = remainder/num
             facts.append(num)
-            counters.append(num)
         num +=1
+    if remainder > 1:
+        facts.append(int(remainder))
     return facts
 
 
 
 if __name__ == "__main__":
-    print(factors(1250214))
+    print(factors(548931))
 
 def next_prime(a):
     pass
